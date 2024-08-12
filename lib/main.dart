@@ -1,7 +1,37 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+class Product {
+  final String name;
+  final String description;
+  final int price;
+  final String image;
+  Product(this.name, this.description, this.price, this.image);
+  static List<Product> getProducts() {
+    List<Product> items = <Product>[];
+    items.add(Product(
+        "iPhone", "iphone is the stylist phone ever", 1000, "iphone.jpg"));
+    items.add(Product(
+        "Pixel", "Pixel is the most featureful phone ever", 800, "pixel.jpg"));
+    items.add(Product("Laptop", "Laptop is most productive development tool",
+        2000, "laptop.jpg"));
+    items.add(Product(
+        "Tablet",
+        "Tablet is the most useful device ever for meeting",
+        1500,
+        "tablet.jpg"));
+    items.add(Product(
+        "Pendrive", "Pendrive is useful storage medium", 100, "pendrive.png"));
+    items.add(Product("Floppy Drive",
+        "Floppy drive is useful rescue storage medium", 20, "floppy.jpg"));
+
+    return items;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -15,197 +45,230 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Product layout demo home page'),
+      home: MyHomePage(title: 'Product layout demo home page'),
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
   final String title;
+  final items = Product.getProducts();
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar:AppBar(
-        title:const Text("Product Listing")
-      ),
-      body:ListView(
-        shrinkWrap: true,
-        padding:const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0),
-        children: [
-          ProductBox(
-            name:"iPhone",description:"iphone is the stylist phone ever",price:1000,image:"iphone.jpg"
-          ),
-          ProductBox(
-              name: "Pixel",
-              description: "Pixel is the most featureful phone ever",
-              price: 800,
-              image: "pixel.jpg"
-          ),
-          ProductBox(
-              name: "Laptop",
-              description: "Laptop is most productive development tool",
-              price: 2000,
-              image: "laptop.jpg"
-          ),
-          ProductBox(
-              name: "Tablet",
-              description: "Tablet is the most useful device ever for meeting",
-              price: 1500,
-              image: "tablet.jpg"
-          ),
-          ProductBox(
-              name: "Pendrive",
-              description: "Pendrive is useful storage medium",
-              price: 100,
-              image: "pendrive.png"
-          ),
-          ProductBox(
-              name: "Floppy Drive",
-              description: "Floppy drive is useful rescue storage medium",
-              price: 20,
-              image: "floppy.jpg"
-          ),
-        ],
-      ),
-    );
+        appBar: AppBar(title: const Text("Product Listing")),
+        body: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              child: ProductBox(item: items[index]),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProductPage(item: items[index])),
+                );
+              },
+            );
+          },
+        ));
   }
 }
 
-class ProductBox extends StatelessWidget{
-  ProductBox({super.key,required this.name,required this.description,required this.price,required this.image});
+class ProductPage extends StatelessWidget {
+  ProductPage({super.key, required this.item});
 
-  final String name;
-  final String description;
-  final int price;
-  final String image;
+  final Product item;
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(this.item.name),
+        ),
+        body: Center(
+            child: Container(
+                padding: EdgeInsets.all(0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(this.item.image),
+                      Expanded(
+                          child: Container(
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    this.item.name,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(this.item.description),
+                                  Text("Price: " + this.item.price.toString()),
+                                  RatingBox(),
+                                ],
+                              )))
+                    ]))));
+  }
+}
+
+class ProductBox extends StatelessWidget {
+  ProductBox({super.key, required this.item});
+  final Product item;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding:const EdgeInsets.all(2),
-      height:180,
-      child:Card(
-        child:Row(
-          mainAxisAlignment:MainAxisAlignment.spaceEvenly,
-          children:[
-            Image.asset(
-              "assets/" + image,
-              width: 220.0, // Set the desired width
-            ),
-            Expanded(child: Container(
-              padding:EdgeInsets.all(5),
-              child:Column(
-                mainAxisAlignment:MainAxisAlignment.spaceEvenly,
+      padding: EdgeInsets.all(2),
+      height: 140,
+      child: Card(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Image.asset(this.item.image),
+            Expanded(
+                child: Container(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(this.name,style:TextStyle(fontWeight: FontWeight.bold)),
-                  Text(this.description),Text("Price: "+this.price.toString()),
-                  RatingBox()
+                  Text(this.item.name,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(this.item.description),
+                  Text("Price:" + this.item.price.toString()),
+                  RatingBox(),
                 ],
-              )
+              ),
             ))
-          ]
-        )
-      )
+          ],
+        ),
+      ),
     );
   }
 }
-class RatingBox extends StatefulWidget{
+
+class RatingBox extends StatefulWidget {
   @override
-  _RatingBoxState createState ()=>_RatingBoxState();
+  _RatingBoxState createState() => _RatingBoxState();
 }
-class _RatingBoxState extends State<RatingBox>{
+
+class _RatingBoxState extends State<RatingBox> {
   int _rating = 0;
-  void _setRatingAsOne(){
+  void _setRatingAsOne() {
     setState(() {
-      _rating =1;
+      _rating = 1;
     });
   }
-  void _setRatingAsTwo(){
+
+  void _setRatingAsTwo() {
     setState(() {
       _rating = 2;
     });
   }
-  void _setRatingAsThree(){
+
+  void _setRatingAsThree() {
     setState(() {
       _rating = 3;
     });
   }
-  void _setRatingAsFour(){
+
+  void _setRatingAsFour() {
     setState(() {
       _rating = 4;
     });
   }
-  void _setRatingAsFive(){
+
+  void _setRatingAsFive() {
     setState(() {
       _rating = 5;
     });
   }
-  Widget build(BuildContext context){
+
+  Widget build(BuildContext context) {
     double _size = 20;
     return Row(
-
-      mainAxisAlignment:MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Expanded(child: Container(
-          padding: EdgeInsets.all(0),
-          child:IconButton(
-            icon:(_rating>=1?Icon(
-              Icons.star,size:_size,
-            )
-                :Icon(Icons.star_border,size:_size)
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(0),
+            child: IconButton(
+              icon: (_rating >= 1
+                  ? Icon(
+                      Icons.star,
+                      size: _size,
+                    )
+                  : Icon(Icons.star_border, size: _size)),
+              color: Colors.red[500],
+              onPressed: _setRatingAsOne,
+              iconSize: _size,
             ),
-            color:Colors.red[500],
-            onPressed: _setRatingAsOne,
-            iconSize: _size,
           ),
-        ), ),
-        Expanded(child:Container(
+        ),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(0),
+            child: IconButton(
+              icon: (_rating >= 2
+                  ? Icon(
+                      Icons.star,
+                      size: _size,
+                    )
+                  : Icon(Icons.star_border, size: _size)),
+              color: Colors.red[500],
+              onPressed: _setRatingAsTwo,
+              iconSize: _size,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(0),
+            child: IconButton(
+              icon: (_rating >= 3
+                  ? Icon(
+                      Icons.star,
+                      size: _size,
+                    )
+                  : Icon(Icons.star_border, size: _size)),
+              color: Colors.red[500],
+              onPressed: _setRatingAsThree,
+              iconSize: _size,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(0),
+            child: IconButton(
+              icon: (_rating >= 4
+                  ? Icon(
+                      Icons.star,
+                      size: _size,
+                    )
+                  : Icon(Icons.star_border, size: _size)),
+              color: Colors.red[500],
+              onPressed: _setRatingAsFour,
+              iconSize: _size,
+            ),
+          ),
+        ),
+        Expanded(
+            child: Container(
           padding: EdgeInsets.all(0),
           child: IconButton(
-            icon: (_rating>=2?
-            Icon(Icons.star,size: _size,):
-            Icon(Icons.star_border,size:_size)
-            ),
-            color:Colors.red[500],
-            onPressed: _setRatingAsTwo,
-            iconSize: _size,
-          ),
-        ), ),
-        Expanded(child:Container(
-          padding: EdgeInsets.all(0),
-          child: IconButton(
-            icon: (_rating>=3?
-            Icon(Icons.star,size: _size,):
-            Icon(Icons.star_border,size:_size)
-            ),
-            color:Colors.red[500],
-            onPressed: _setRatingAsThree,
-            iconSize: _size,
-          ),
-        ), ),
-        Expanded(child: Container(
-          padding: EdgeInsets.all(0),
-          child: IconButton(
-            icon: (_rating>=4?
-            Icon(Icons.star,size: _size,):
-            Icon(Icons.star_border,size:_size)
-            ),
-            color:Colors.red[500],
-            onPressed: _setRatingAsFour,
-            iconSize: _size,
-          ),
-        ),),
-        Expanded(child: Container(
-          padding: EdgeInsets.all(0),
-          child: IconButton(
-            icon: (_rating>=5?
-            Icon(Icons.star,size: _size,):
-            Icon(Icons.star_border,size:_size)
-            ),
-            color:Colors.red[500],
+            icon: (_rating >= 5
+                ? Icon(
+                    Icons.star,
+                    size: _size,
+                  )
+                : Icon(Icons.star_border, size: _size)),
+            color: Colors.red[500],
             onPressed: _setRatingAsFive,
             iconSize: _size,
           ),
